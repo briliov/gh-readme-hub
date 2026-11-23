@@ -46,6 +46,39 @@ def resolve_out_dir(cli_out: Path | None, push: bool = False) -> Path:
         return cli_out.expanduser().resolve()
     sys.exit('Error: Specify output target via -o <dir> or --push.')
 
+
+
+def load_local_presets(_out_dir: Path | None = None) -> dict[str, list[str]]:
+    """Load presets from presets.json next to the script, initializing defaults if missing."""
+    presets_file = Path(__file__).resolve().parent / 'presets.json'
+    if not presets_file.exists():
+        presets_file.write_text(
+            json.dumps(DEFAULT_PRESETS, indent=2) + '\n',
+            encoding='utf-8',
+        )
+        return dict(DEFAULT_PRESETS)
+
+    try:
+        data = json.loads(presets_file.read_text(encoding='utf-8'))
+        if isinstance(data, dict):
+            return {str(k): list(v) for k, v in data.items()}
+    except (json.JSONDecodeError, TypeError) as exc:
+        sys.exit(f"Error reading '{presets_file}': {exc}")
+    return dict(DEFAULT_PRESETS)
+
+
+def save_local_preset(_out_dir: Path | None, name: str, colors: list[str]) -> None:
+    """Save or update a named color preset inside presets.json."""
+    presets = load_local_presets()
+    presets[name] = colors
+    presets_file = Path(__file__).resolve().parent / 'presets.json'
+    presets_file.write_text(
+        json.dumps(presets, indent=2) + '\n',
+        encoding='utf-8',
+    )
+    print(f"Saved preset '{name}' ({', '.join(colors)}) -> {presets_file}")
+
+
 def get_figlet_font_dir() -> Path:
     """Return local FIGlet fonts directory path."""
     figlet_bin = shutil.which('figlet')
@@ -385,6 +418,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         type=int,
         default=DEFAULT_PAD,
         help='Uniform padding around the banner (Zsh lines/spaces and SVG margins)',
+    )
+    parser.add_argument(
+        '--push',
+        action='store_true',
+        help='Save generated banner directly into repository assets/banner/',
     )
     parser.add_argument(
         '-o',

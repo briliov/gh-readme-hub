@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
 set -e
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
-OUT_DIR="$REPO_ROOT/assets/banner"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE}")" && pwd)"
 BUILDER_PATH="$SCRIPT_DIR/build.py"
-ZSHRC="$HOME/.zshrc"
+BIN_DIR="$HOME/.local/bin"
+TARGET_LINK="$BIN_DIR/set-banner"
 
-# 1. Проверка и установка figlet через Homebrew
+# 1. Проверяем наличие figlet
 if ! command -v figlet >/dev/null 2>&1; then
   if command -v brew >/dev/null 2>&1; then
     echo "Installing figlet via Homebrew..."
@@ -18,22 +17,10 @@ if ! command -v figlet >/dev/null 2>&1; then
   fi
 fi
 
-mkdir -p "$OUT_DIR"
+# 2. Делаем build.py исполняемым и создаем симлинк в ~/.local/bin/set-banner
 chmod +x "$BUILDER_PATH"
+mkdir -p "$BIN_DIR"
+ln -sf "$BUILDER_PATH" "$TARGET_LINK"
 
-# 2. Добавление настроек в ~/.zshrc (если еще не добавлены)
-touch "$ZSHRC"
-if ! grep -q "# >>> gh-readme-hub banner >>>" "$ZSHRC"; then
-  cat <<ZSH >> "$ZSHRC"
-
-# >>> gh-readme-hub banner >>>
-export BANNER_OUT_DIR="$OUT_DIR"
-alias set-banner="python3 $BUILDER_PATH"
-# <<< gh-readme-hub banner <<<
-ZSH
-  echo "Added 'set-banner' alias and BANNER_OUT_DIR to $ZSHRC"
-else
-  echo "Zsh configuration already exists in $ZSHRC"
-fi
-
-echo "Done! Run 'source ~/.zshrc' and try: set-banner -t \"HELLO\""
+echo "Linked: $TARGET_LINK -> $BUILDER_PATH"
+echo "Done! Try running: set-banner --help"
