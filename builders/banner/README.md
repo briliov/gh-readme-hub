@@ -1,77 +1,84 @@
-# Banner Builder
+<p align="center">
+  <img src="../../assets/banner/banner.svg" alt="Banner Preview" />
+</p>
 
-CLI utility to generate multi-stop gradient SVG banners (`banner.svg`) and Zsh greetings (`banner.zsh`) using local `FIGlet` fonts.
+<h1 align="center">Banner Builder</h1>
 
-## Two Ways to Use
-
-### 1. Integrated with `gh-readme-hub` (GitHub Profile Mode)
-Use this mode to automatically save generated banners into `assets/banner/` for your GitHub profile `README.md`.
-
-1. **Run the installer** from the repository root:
-   ```bash
-   ./builders/banner/install.sh
-   source ~/.zshrc
-   ```
-   *(This installs `figlet` if missing, sets `BANNER_OUT_DIR` to `assets/banner`, and adds the `set-banner` alias).*
-
-2. **Generate or update your profile banner** from anywhere:
-   ```bash
-   set-banner -t "YOUR_NAME" -f ansi_shadow -p steel
-   ```
-
-3. **Preview in terminal**:
-   ```bash
-   zsh "\$BANNER_OUT_DIR/banner.zsh"
-   ```
+<p align="center">
+  Offline-first CLI tool for generating multi-stop RGB gradient <b>SVG banners</b> and true-color <b>Zsh greetings</b> via local <code>FIGlet</code>.
+</p>
 
 ---
 
-### 2. Standalone Mode (Any Project or Zsh Greeting)
-Use the script independently without touching `gh-readme-hub` assets — save banners to any folder or render a custom Zsh welcome message on terminal startup.
+## Why Use It
 
-* **Generate a banner inside another repository:**
-  ```bash
-  python3 builders/banner/build.py -t "MY API" -p cyber -o ./docs/assets
-  ```
-
-* **Use as an automatic Zsh terminal greeting** (add to `~/.zshrc`):
-  ```zsh
-  [[ -f "\$BANNER_OUT_DIR/banner.zsh" ]] && source "\$BANNER_OUT_DIR/banner.zsh"
-  ```
+* **Zero external SVG services** — renders crisp vector `<tspan>` graphics locally in milliseconds.
+* **Dual output** — builds `banner.svg` for GitHub and `banner.zsh` for your terminal in one shot.
+* **Unlimited gradient stops** — pass any number of HEX colors and save favorite palettes to `presets.json`.
+* **Built-in font manager** — browse installed fonts or pull new `.flf` styles straight from `xero/figlet-fonts`.
 
 ---
 
-## Common Commands
+## Two Ways to Run
 
-* **Switch preset:**
-  ```bash
-  set-banner -p ocean
-  ```
-* **Custom gradient (any number of HEX colors) & save to `presets.json`:**
-  ```bash
-  set-banner -c '#ffffff,#38bdf8,#1d4ed8' --save-preset ice
-  ```
-* **Adjust gradient direction (`horizontal`, `vertical`, `diagonal`) and outer padding:**
-  ```bash
-  set-banner -d vertical --pad 2
-  ```
-* **List or install FIGlet fonts:**
-  ```bash
-  set-banner -l
-  set-banner -l install "ANSI Shadow"
-  ```
+### 1. Hub Mode (GitHub Profile Assets)
+Connect the builder to your Zsh environment so `set-banner` updates `assets/banner/` from any directory.
 
-## CLI Flags
+```bash
+./builders/banner/install.sh
+source ~/.zshrc
+set-banner -t "BRILIOV" -f ansi_shadow -p steel
+```
+
+> **Tip:** Preview your terminal greeting anytime with `zsh "$BANNER_OUT_DIR/banner.zsh"` or source it at the bottom of `~/.zshrc`.
+
+### 2. Standalone Mode (Any Project)
+Run the script independently without touching profile assets — save output into any target folder via `-o`.
+
+```bash
+python3 builders/banner/build.py -t "MY API" -f slant -p cyber -o ./docs/img
+```
+
+---
+
+## Built-in Color Presets
+
+Stored in `builders/banner/presets.json` (extendable via `--save-preset <name>`):
+
+| Preset | Palette Stops | Vibe |
+| :--- | :--- | :--- |
+| `steel` | `#cbd5e1` → `#64748b` → `#38bdf8` | Cold metallic blue *(default)* |
+| `fire` | `#ff0000` → `#ff5f00` → `#ffaf00` → `#ffd700` | Warm ember gradient |
+| `cyber` | `#9d00ff` → `#ff007f` → `#00f0ff` | Synthwave neon |
+| `emerald` | `#00875f` → `#00d787` → `#afff00` | Matrix / terminal green |
+| `ocean` | `#0033ff` → `#0099ff` → `#00ffff` | Deep electric blue |
+| `mono` | `#585858` → `#9e9e9e` → `#ffffff` | Minimalist grayscale |
+
+---
+
+## Recipes & CLI Flags
+
+```bash
+# Create a custom 4-stop gradient with outer padding and save it as a preset
+set-banner -c '#ffffff,#bae6fd,#38bdf8,#1d4ed8' --pad 2 --save-preset ice
+
+# Re-color existing banner.txt with a vertical flow
+set-banner -p ice -d vertical
+
+# List installed/remote fonts or install a new one
+set-banner -l
+set-banner -l install "ANSI Shadow"
+```
 
 | Flag | Default | Description |
 | :--- | :--- | :--- |
 | `-t, --text` | *cached* | Text to render via `figlet` (reuses `banner.txt` if omitted). |
 | `-f, --font` | `standard` | Local FIGlet font name. |
-| `-p, --preset` | `steel` | Theme from `builders/banner/presets.json`. |
-| `-c, --colors` | — | Custom HEX colors separated by comma or space. |
+| `-p, --preset` | `steel` | Theme name from `presets.json`. |
+| `-c, --colors` | — | Custom HEX stops separated by comma or space. |
 | `--save-preset` | — | Save current colors into `presets.json`. |
 | `-d, --direction` | `diagonal` | Gradient flow: `horizontal`, `vertical`, `diagonal`. |
 | `-s, --size` | `16` | SVG font size in pixels. |
-| `--pad` | `1` | Uniform padding around banner (lines/spaces and SVG margins). |
-| `-o, --out` | `$BANNER_OUT_DIR` | Target output directory (defaults to current working dir). |
+| `--pad` | `1` | Uniform padding around banner (Zsh lines/spaces & SVG margins). |
+| `-o, --out` | `$BANNER_OUT_DIR` | Output directory (falls back to current working dir). |
 | `-l, --list-fonts` | — | Show fonts or install via `-l install <FONT>`. |
