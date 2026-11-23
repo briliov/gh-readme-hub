@@ -1,12 +1,20 @@
-<p align="center">
-  <img src="../../assets/banner/banner.svg" alt="Banner Preview" />
-</p>
-
 <h1 align="center">Banner Builder</h1>
 
 <p align="center">
   Offline-first CLI tool for generating multi-stop RGB gradient <b>SVG banners</b> and true-color <b>Zsh greetings</b> via local <code>FIGlet</code>.
 </p>
+
+```text
+ ██▓███   ▄▄▄       ███▄    █  ███▄    █ ▓█████  ██▀███  
+▓██░  ██▒▒████▄     ██ ▀█   █  ██ ▀█   █ ▓█   ▀ ▓██ ▒ ██▒
+▓██░ ██▓▒▒██  ▀█▄  ▓██  ▀█ ██▒▓██  ▀█ ██▒▒███   ▓██ ░▄█ ▒
+▒██▄█▓▒ ▒░██▄▄▄▄██ ▓██▒  ▐▌██▒▓██▒  ▐▌██▒▒▓█  ▄ ▒██▀▀█▄  
+▒██▒ ░  ░ ▓█   ▓██▒▒██░   ▓██░▒██░   ▓██░░▒████▒░██▓ ▒██▒
+▒▓▒░ ░  ░ ▒▒   ▓▒█░░ ▒░   ▒ ▒ ░ ▒░   ▒ ▒ ░░ ▒░ ░░ ▒▓ ░▒▓░
+░▒ ░       ▒   ▒▒ ░░ ░░   ░ ▒░░ ░░   ░ ▒░ ░ ░  ░  ░▒ ░ ▒░
+░░         ░   ▒      ░   ░ ░    ░   ░ ░    ░     ░░   ░ 
+               ░  ░         ░          ░    ░  ░   ░     
+```
 
 ---
 
