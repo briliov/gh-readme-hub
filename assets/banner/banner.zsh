@@ -1,9 +1,13 @@
 print -P \
 "
- %F{#ffffff}█%F{#fcfeff}█%F{#f8fdff}█%F{#f5fbff}█%F{#f2faff}█%F{#eef9ff}█%F{#ebf8fe}╗ %F{#e5f5fe}█%F{#e1f4fe}█%F{#def3fe}█%F{#dbf2fe}█%F{#d7f1fe}█%F{#d4effe}█%F{#d1eefe}╗ %F{#caecfd}█%F{#c7ebfd}█%F{#c4e9fd}╗%F{#c0e8fd}█%F{#bde7fd}█%F{#b9e6fd}╗     %F{#94dafc}█%F{#8ed8fb}█%F{#88d6fb}╗ %F{#7bd2fb}█%F{#75d0fa}█%F{#6fcefa}█%F{#68ccfa}█%F{#62cafa}█%F{#5cc8f9}█%F{#56c6f9}╗ %F{#49c2f9}█%F{#43c0f8}█%F{#3dbff8}╗   %F{#34acf3}█%F{#33a7f2}█%F{#31a1f0}╗%f
- %F{#f5fbff}█%F{#f1faff}█%F{#eef9ff}╔%F{#ebf8fe}═%F{#e7f6fe}═%F{#e4f5fe}█%F{#e1f4fe}█%F{#def3fe}╗%F{#daf2fe}█%F{#d7f0fe}█%F{#d4effe}╔%F{#d0eefe}═%F{#cdedfe}═%F{#caecfd}█%F{#c6eafd}█%F{#c3e9fd}╗%F{#c0e8fd}█%F{#bce7fd}█%F{#b8e6fd}║%F{#b2e4fd}█%F{#ace2fc}█%F{#a6e0fc}║     %F{#80d4fb}█%F{#7ad2fb}█%F{#74d0fa}║%F{#6ecefa}█%F{#68ccfa}█%F{#61cafa}╔%F{#5bc8f9}═%F{#55c6f9}═%F{#4fc4f9}═%F{#48c2f9}█%F{#42c0f8}█%F{#3cbef8}╗%F{#38bbf7}█%F{#36b6f6}█%F{#35b0f4}║   %F{#309bee}█%F{#2e96ed}█%F{#2d91eb}║%f
- %F{#eaf8fe}█%F{#e7f6fe}█%F{#e4f5fe}█%F{#e0f4fe}█%F{#ddf3fe}█%F{#daf2fe}█%F{#d6f0fe}╔%F{#d3effe}╝%F{#d0eefe}█%F{#cdedfe}█%F{#c9ecfd}█%F{#c6eafd}█%F{#c3e9fd}█%F{#bfe8fd}█%F{#bce7fd}╔%F{#b8e5fd}╝%F{#b1e3fd}█%F{#abe1fc}█%F{#a5dffc}║%F{#9fddfc}█%F{#99dbfc}█%F{#92d9fb}║     %F{#6dcefa}█%F{#67ccfa}█%F{#61cafa}║%F{#5ac8f9}█%F{#54c6f9}█%F{#4ec4f9}║   %F{#37baf7}█%F{#36b5f6}█%F{#35b0f4}║%F{#33aaf3}█%F{#32a5f1}█%F{#31a0f0}║   %F{#2c8be9}█%F{#2a85e8}█%F{#2980e6}║%f
- %F{#e0f4fe}█%F{#ddf3fe}█%F{#d9f1fe}╔%F{#d6f0fe}═%F{#d3effe}═%F{#cfeefe}█%F{#ccedfe}█%F{#c9ebfd}╗%F{#c6eafd}█%F{#c2e9fd}█%F{#bfe8fd}╔%F{#bce7fd}═%F{#b7e5fd}═%F{#b1e3fd}█%F{#aae1fc}█%F{#a4dffc}╗%F{#9eddfc}█%F{#98dbfc}█%F{#91d9fb}║%F{#8bd7fb}█%F{#85d5fb}█%F{#7fd3fb}║     %F{#59c8f9}█%F{#53c6f9}█%F{#4dc4f9}║%F{#47c2f9}█%F{#41c0f8}█%F{#3abef8}║   %F{#33aaf2}█%F{#32a4f1}█%F{#319fef}║%F{#2f9aee}╚%F{#2e94ec}█%F{#2d8feb}█%F{#2c8ae9}╗ %F{#297fe6}█%F{#287ae5}█%F{#2675e3}╔%F{#256fe2}╝%f
- %F{#d6f0fe}█%F{#d2effe}█%F{#cfeefe}█%F{#ccecfe}█%F{#c8ebfd}█%F{#c5eafd}█%F{#c2e9fd}╔%F{#bee8fd}╝%F{#bbe6fd}█%F{#b6e5fd}█%F{#b0e3fd}║  %F{#9dddfc}█%F{#97dbfc}█%F{#91d9fb}║%F{#8ad7fb}█%F{#84d5fb}█%F{#7ed3fb}║%F{#78d1fa}█%F{#72cffa}█%F{#6bcdfa}█%F{#65cbfa}█%F{#5fc9f9}█%F{#59c7f9}█%F{#52c5f9}█%F{#4cc3f9}╗%F{#46c1f9}█%F{#40bff8}█%F{#3abdf8}║%F{#37b9f7}╚%F{#36b4f5}█%F{#34aef4}█%F{#33a9f2}█%F{#32a4f1}█%F{#319eef}█%F{#2f99ee}█%F{#2e94ec}╔%F{#2d8eeb}╝ %F{#2a84e8}╚%F{#297fe6}█%F{#2879e4}█%F{#2674e3}█%F{#256fe1}█%F{#2469e0}╔%F{#2264de}╝ %f
- %F{#cbecfe}╚%F{#c8ebfd}═%F{#c5eafd}═%F{#c1e9fd}═%F{#bee7fd}═%F{#bbe6fd}═%F{#b5e4fd}╝ %F{#a9e1fc}╚%F{#a2dffc}═%F{#9cddfc}╝  %F{#8ad7fb}╚%F{#83d5fb}═%F{#7dd3fb}╝%F{#77d1fa}╚%F{#71cffa}═%F{#6acdfa}╝%F{#64cbfa}╚%F{#5ec9f9}═%F{#58c7f9}═%F{#52c5f9}═%F{#4bc3f9}═%F{#45c1f9}═%F{#3fbff8}═%F{#39bdf8}╝%F{#37b8f7}╚%F{#36b3f5}═%F{#34aef4}╝ %F{#32a3f1}╚%F{#309eef}═%F{#2f98ed}═%F{#2e93ec}═%F{#2d8eea}═%F{#2b88e9}═%F{#2a83e7}╝   %F{#256ee1}╚%F{#2369e0}═%F{#2263de}═%F{#215edd}═%F{#2059db}╝  %f
+  %F{#ff0000}▄▄▄▄    ██▀███   ██▓ ██▓     ██▓ ▒█████   ██▒   █▓%f
+ %F{#ff2000}▓█████▄ ▓██ ▒ ██▒▓██▒▓██▒    ▓██▒▒██▒  ██▒▓██░   █▒%f
+ %F{#ff3f00}▒██▒ ▄██▓██ ░▄█ ▒▒██▒▒██░    ▒██▒▒██░  ██▒ ▓██  █▒░%f
+ %F{#ff5f00}▒██░█▀  ▒██▀▀█▄  ░██░▒██░    ░██░▒██   ██░  ▒██ █░░%f
+ %F{#ff7a00}░▓█  ▀█▓░██▓ ▒██▒░██░░██████▒░██░░ ████▓▒░   ▒▀█░  %f
+ %F{#ff9400}░▒▓███▀▒░ ▒▓ ░▒▓░░▓  ░ ▒░▓  ░░▓  ░ ▒░▒░▒░    ░ ▐░  %f
+ %F{#ffaf00}▒░▒   ░   ░▒ ░ ▒░ ▒ ░░ ░ ▒  ░ ▒ ░  ░ ▒ ▒░    ░ ░░  %f
+  %F{#ffbc00}░    ░   ░░   ░  ▒ ░  ░ ░    ▒ ░░ ░ ░ ▒       ░░  %f
+  %F{#ffca00}░         ░      ░      ░  ░ ░      ░ ░        ░  %f
+       %F{#ffd700}░                                        ░   %f
 "
