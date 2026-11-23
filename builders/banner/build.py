@@ -36,15 +36,18 @@ REMOTE_FONTS_RAW = (
 )
 
 
-def resolve_out_dir(cli_out: Path | None) -> Path:
-    """Resolve output directory from CLI flag, env var, or current directory."""
+def resolve_out_dir(cli_out: Path | None, push: bool = False) -> Path:
+    """Resolve output directory: repo assets/banner if --push, else CLI -> env -> cwd."""
+    if push:
+        hub_env = os.environ.get('GH_HUB_DIR')
+        repo_root = Path(hub_env).expanduser().resolve() if hub_env else Path(__file__).resolve().parents
+        return repo_root / 'assets' / 'banner'
     if cli_out is not None:
         return cli_out.expanduser().resolve()
     env_out = os.environ.get('BANNER_OUT_DIR')
     if env_out:
         return Path(env_out).expanduser().resolve()
     return Path.cwd()
-
 
 def load_local_presets(out_dir: Path) -> dict[str, list[str]]:
     """Load presets from presets.json in out_dir, initializing defaults if missing."""
@@ -250,7 +253,7 @@ def parse_color_list(raw: str) -> list[str]:
 
 def build(args: argparse.Namespace) -> None:
     """Generate banner.txt, banner.zsh, and banner.svg in the target directory."""
-    out_dir = resolve_out_dir(args.out)
+    out_dir = resolve_out_dir(args.out, args.push)
     out_dir.mkdir(parents=True, exist_ok=True)
     presets = load_local_presets(out_dir)
 
