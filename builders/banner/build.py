@@ -4,7 +4,6 @@
 import argparse
 import html
 import json
-import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -29,7 +28,7 @@ DEFAULT_PRESETS: dict[str, list[str]] = {
 }
 
 PRESETS_PATH = Path(__file__).resolve().parent / 'presets.json'
-REPO_ASSETS_DIR = Path(__file__).resolve().parents[2] / 'assets'
+REPO_ASSETS_DIR = Path(__file__).resolve().parents / 'assets'
 REMOTE_FONTS_API = 'https://' + '://github.com'
 REMOTE_FONTS_RAW = 'https://' + '://githubusercontent.com'
 
@@ -213,15 +212,15 @@ def interpolate_color(colors: list[tuple[int, int, int]], t: float) -> str:
     """Interpolate a color across any number of RGB stops at position t."""
     t = max(0.0, min(1.0, t))
     if len(colors) == 1:
-        return rgb_to_hex(colors[0])
+        return rgb_to_hex(colors)
     scaled = t * (len(colors) - 1)
     idx = min(int(scaled), len(colors) - 2)
     frac = scaled - idx
     c1, c2 = colors[idx], colors[idx + 1]
     blended = (
-        round(c1[0] + (c2[0] - c1[0]) * frac),
-        round(c1[1] + (c2[1] - c1[1]) * frac),
-        round(c1[2] + (c2[2] - c1[2]) * frac),
+        round(c1 + (c2 - c1) * frac),
+        round(c1 + (c2 - c1) * frac),
+        round(c1 + (c2 - c1) * frac),
     )
     return rgb_to_hex(blended)
 
@@ -289,7 +288,7 @@ def build(args: argparse.Namespace) -> None:
     colors = [hex_to_rgb(c) for c in raw_colors]
 
     raw_lines = art_path.read_text(encoding='utf-8').splitlines()
-    while raw_lines and not raw_lines[0].strip():
+    while raw_lines and not raw_lines.strip():
         raw_lines.pop(0)
     while raw_lines and not raw_lines[-1].strip():
         raw_lines.pop()
@@ -458,7 +457,7 @@ def main() -> None:
         else:
             tokens = (
                 args.list_fonts[1:]
-                if args.list_fonts[0].lower() == 'install'
+                if args.list_fonts.lower() == 'install'
                 else args.list_fonts
             )
             if not tokens:
