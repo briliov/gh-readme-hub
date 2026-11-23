@@ -1,72 +1,60 @@
-![BRILIOV](./data/banner.svg)
+# Banner Builder
 
-# Dynamic Banner CLI
+Simple CLI utility to generate gradient SVG banners (`banner.svg`) and Zsh greetings (`banner.zsh`).
 
-Offline Python CLI utility to render colored Zsh terminal banners (`banner.zsh`) and transparent vector graphics (`banner.svg`) from ASCII art or local FIGlet fonts.
+## Quick Start
 
-## Requirements
+1. **Run the installer** from the repository root:
+   ```bash
+   ./builders/banner/install.sh
+   source ~/.zshrc
+   ```
 
-* **Python 3.10+** (standard library only, zero external packages)
-* **FIGlet** *(optional, required only when generating new text via `-t`)*:
+2. **Generate your first banner**:
+   ```bash
+   set-banner -t "YOUR_NAME" -p steel
+   ```
+
+3. **Preview in terminal**:
+   ```bash
+   zsh "\$BANNER_OUT_DIR/banner.zsh"
+   ```
+
+## Common Commands
+
+* **Change colors (using a preset):**
   ```bash
-  brew install figlet
+  set-banner -p cyber
+  ```
+* **Custom gradient (any number of HEX colors) & save as preset:**
+  ```bash
+  set-banner -c '#ffffff,#38bdf8,#1d4ed8' --save-preset ice
+  ```
+* **Change direction (`horizontal`, `vertical`, `diagonal`) and outer padding:**
+  ```bash
+  set-banner -d vertical --pad 2
+  ```
+* **List or install FIGlet fonts:**
+  ```bash
+  set-banner -l
+  set-banner -l install "ANSI Shadow"
+  ```
+* **Save to a custom folder (overrides `BANNER_OUT_DIR`):**
+  ```bash
+  set-banner -t "DOCS" -o ./my-folder
   ```
 
-## Directory Layout
+## CLI Flags
 
-```text
-banner/
-├── data/
-│   ├── banner.txt    # Source ASCII art template
-│   ├── banner.zsh    # Generated Zsh script with 24-bit HEX colors
-│   └── banner.svg    # Generated transparent SVG banner
-└── build.py          # Executable CLI generator
-```
-
-## Usage
-
-Make the script executable once:
-```bash
-chmod +x build.py
-```
-
-### Commands & Examples
-
-* **Apply a built-in gradient preset** (`fire`, `cyber`, `emerald`, `mono`, `ocean`):
-  ```bash
-  ./build.py -p cyber
-  ```
-
-* **Set custom HEX color stops and gradient direction** (`horizontal`, `vertical`, `diagonal`):
-  ```bash
-  ./build.py -c "#ff0055,#7700ff,#00ffff" -d vertical
-  ```
-
-* **Generate new ASCII text using a local FIGlet font:**
-  ```bash
-  ./build.py -t "BRILIOV" -f Bloody -p fire
-  ```
-
-* **Customize SVG font size and terminal vertical padding:**
-  ```bash
-  ./build.py -p emerald -s 18 --pad-top 0 --pad-bottom 1
-  ```
-
-* **Inspect available presets, fonts, and CLI flags:**
-  ```bash
-  ./build.py --list-presets
-  ./build.py --list-fonts
-  ./build.py --help
-  ```
-
-## Zsh Integration
-
-Add this to your `.zshrc` to display the banner on shell startup and expose the `set-banner` helper:
-
-```zsh
-source ~/.dotfiles/src/banner/data/banner.zsh
-
-set-banner() {
-  ~/.dotfiles/src/banner/build.py "\$@" && source ~/.dotfiles/src/banner/data/banner.zsh
-}
-```
+| Flag | Default | Description |
+| :--- | :--- | :--- |
+| `-t, --text` | *cached* | Text to render via `figlet` (reuses `banner.txt` if omitted). |
+| `-f, --font` | `standard` | Local FIGlet font name. |
+| `-p, --preset` | `steel` | Theme from `builders/banner/presets.json`. |
+| `-c, --colors` | — | Custom HEX colors separated by comma or space. |
+| `--save-preset` | — | Save current colors to `presets.json`. |
+| `-d, --direction` | `diagonal` | Gradient flow: `horizontal`, `vertical`, `diagonal`. |
+| `-s, --size` | `16` | SVG font size in pixels. |
+| `--pad` | `1` | Uniform padding around banner (lines/spaces and SVG margins). |
+| `-o, --out` | `$BANNER_OUT_DIR` | Target output directory. |
+| `-l, --list-fonts` | — | Show fonts or install via `-l install <FONT>`. |
