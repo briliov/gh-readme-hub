@@ -3,6 +3,7 @@
 
 import argparse
 import html
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -24,14 +25,18 @@ PRESETS: dict[str, list[str]] = {
     'emerald': ['#00875f', '#00d787', '#afff00'],
     'mono': ['#585858', '#9e9e9e', '#ffffff'],
     'ocean': ['#0033ff', '#0099ff', '#00ffff'],
+    'steel': ['#cbd5e1', '#64748b', '#38bdf8'],
 }
 
-BASE_DIR = Path(__file__).resolve().parent
-DATA_DIR = BASE_DIR / 'data'
 
-ART_PATH = DATA_DIR / 'banner.txt'
-ZSH_OUT = DATA_DIR / 'banner.zsh'
-SVG_OUT = DATA_DIR / 'banner.svg'
+def resolve_out_dir(cli_out: Path | None) -> Path:
+    """Resolve output directory from CLI flag, env var, or current working directory."""
+    if cli_out is not None:
+        return cli_out.expanduser().resolve()
+    env_out = os.environ.get('BANNER_OUT_DIR')
+    if env_out:
+        return Path(env_out).expanduser().resolve()
+    return Path.cwd()
 
 
 def generate_figlet(text: str, font: str) -> str:
@@ -118,7 +123,7 @@ def get_progress(
 
 
 def build(args: argparse.Namespace) -> None:
-    """Generate banner.zsh and banner.svg inside data/."""
+    """Generate banner.txt, banner.zsh, and banner.svg in the chosen directory."""
     if args.colors:
         raw_colors = [c.strip() for c in args.colors.split(',') if c.strip()]
         theme_label = f'custom ({args.colors})'
@@ -129,19 +134,24 @@ def build(args: argparse.Namespace) -> None:
         raw_colors = PRESETS[args.preset]
         theme_label = args.preset
 
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    out_dir = resolve_out_dir(args.out)
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    art_path = out_dir / 'banner.txt'
+    zsh_out = out_dir / 'banner.zsh'
+    svg_out = out_dir / 'banner.svg'
 
     if args.text:
         art_raw = generate_figlet(args.text, args.font)
-        ART_PATH.write_text(art_raw, encoding='utf-8')
-    elif not ART_PATH.exists():
+        art_path.write_text(art_raw, encoding='utf-8')
+    elif not art_path.exists():
         sys.exit(
-            "No data/banner.txt found. Pass -t 'YOUR_TEXT' to generate one."
+            f"No '{art_path}' found. Pass -t 'YOUR_TEXT' to generate one."
         )
 
     colors = [hex_to_rgb(c) for c in raw_colors]
 
-    raw_lines = ART_PATH.read_text(encoding='utf-8').splitlines()
+    raw_lines = art_path.read_text(encoding='utf-8').splitlines()
     while raw_lines and not raw_lines[0].strip():
         raw_lines.pop(0)
     while raw_lines and not raw_lines[-1].strip():
@@ -205,21 +215,21 @@ def build(args: argparse.Namespace) -> None:
     zsh_content = (
         f'print -P \\\n"{top_pad}' + '\n'.join(zsh_lines) + f'{bot_pad}"\n'
     )
-    ZSH_OUT.write_text(zsh_content, encoding='utf-8')
+    zsh_out.write_text(zsh_content, encoding='utf-8')
 
     svg_w = round(width * char_w, 2)
     svg_h = round(height * line_h, 2)
     svg_content = (
         f'<svg width="{svg_w}" height="{svg_h}" viewBox="0 0 {svg_w} {svg_h}" '
-        f'xmlns="http://www.w3.org/2000/svg">\n'
+        f'xmlns="http://w3.org">\n'
         f'  <g font-family="JetBrains Mono, Menlo, Monaco, Consolas, monospace" '
         f'font-size="{args.size}px">\n'
         + '\n'.join(svg_rows)
         + '\n  </g>\n</svg>\n'
     )
-    SVG_OUT.write_text(svg_content, encoding='utf-8')
+    svg_out.write_text(svg_content, encoding='utf-8')
     print(
-        f'Done! Theme: {theme_label} | Direction: {args.direction} | Size: {args.size}px'
+        f'Done! Saved to {out_dir} | Theme: {theme_label} | Direction: {args.direction} | Size: {args.size}px'
     )
 
 
@@ -231,7 +241,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         '-t',
         '--text',
-        help='Generate new ASCII art with FIGlet (if omitted, uses data/banner.txt)',
+        help='Generate new ASCII art with FIGlet (if omitted, uses banner.txt in output dir)',
     )
     parser.add_argument(
         '-f', '--font', default=DEFAULT_FONT, help='Local FIGlet font'
@@ -262,36 +272,36 @@ def parse_args() -> argparse.Namespace:
         help='SVG font size in px',
     )
     parser.add_argument(
-        '--pad-top',
-        type=int,
-        default=DEFAULT_PAD_TOP,
-        help='Empty lines above Zsh banner',
+        '-o',
+        '--out',
+        type=Path,
+        help='Output directory (defaults to BANNER_OUT_DIR env var or current dir)',
+    )
+    parser.add_argument(
+        '--pad-top', type=int, default=DEFAULT_PAD_TOP, help='Zsh top padding'
     )
     parser.add_argument(
         '--pad-bottom',
         type=int,
         default=DEFAULT_PAD_BOTTOM,
-        help='Empty lines below Zsh banner',
+        help='Zsh bottom padding',
     )
     parser.add_argument(
         '--list-fonts',
         action='store_true',
-        help='List all installed local FIGlet fonts and exit',
-    )
-    parser.add_argument(
-        '--list-presets',
-        action='store_true',
-        help='List built-in color presets and exit',
+        help='List available local FIGlet fonts and exit',
     )
     return parser.parse_args()
 
 
-if __name__ == '__main__':
-    cli_args = parse_args()
-    if cli_args.list_fonts:
+def main() -> None:
+    """CLI entry point."""
+    args = parse_args()
+    if args.list_fonts:
         list_local_fonts()
-    elif cli_args.list_presets:
-        for name, palette in PRESETS.items():
-            print(f'{name:10} -> {", ".join(palette)}')
-    else:
-        build(cli_args)
+        return
+    build(args)
+
+
+if __name__ == '__main__':
+    main()
