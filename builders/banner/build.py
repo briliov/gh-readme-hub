@@ -9,9 +9,9 @@ import shutil
 import subprocess
 import sys
 
-# ==========================================
-# ЗНАЧЕНИЯ ПО УМОЛЧАНИЮ
-# ==========================================
+# =======================================================================
+# DEFAULT VALUES
+# =======================================================================
 DEFAULT_FONT = 'standard'
 DEFAULT_PRESET = 'fire'
 DEFAULT_DIRECTION = 'diagonal'
@@ -219,9 +219,10 @@ def build(args: argparse.Namespace) -> None:
 
     svg_w = round(width * char_w, 2)
     svg_h = round(height * line_h, 2)
+    svg_ns = 'http://' + 'www.w3.org' + '/2000/svg'
     svg_content = (
         f'<svg width="{svg_w}" height="{svg_h}" viewBox="0 0 {svg_w} {svg_h}" '
-        f'xmlns="http://w3.org">\n'
+        f'xmlns="{svg_ns}">\n'
         f'  <g font-family="JetBrains Mono, Menlo, Monaco, Consolas, monospace" '
         f'font-size="{args.size}px">\n'
         + '\n'.join(svg_rows)
