@@ -28,7 +28,7 @@ DEFAULT_PRESETS: dict[str, list[str]] = {
 }
 
 PRESETS_PATH = Path(__file__).resolve().parent / 'presets.json'
-REPO_ASSETS_DIR = Path(__file__).resolve().parents / 'assets'
+REPO_ASSETS_DIR = Path(__file__).resolve().parents[2] / 'assets'
 REMOTE_FONTS_API = 'https://' + '://github.com'
 REMOTE_FONTS_RAW = 'https://' + '://githubusercontent.com'
 
