@@ -1,0 +1,43 @@
+ignore:
+  - cli
+  - html
+
+aliases:
+  djangorest: DRF
+
+groups:
+  Backend:
+    - python
+    - django
+    - djangorest
+    - flask
+    - aiohttp
+    - pydantic
+    - pytest
+    - pythonanywhere
+  Frontend:
+    - nodejs
+    - html5
+    - css
+    - bootstrap
+  Databases:
+    - postgresql
+    - sql
+    - sqlite
+    - sqlalchemy
+  API & Docs:
+    - jwt
+    - swagger
+    - openapi
+    - postman
+  DevOps:
+    - nginx
+    - docker
+    - github-actions
+  Tools & Ecosystem:
+    - ruff
+    - markdown
+    - powershell
+    - git
+    - telegram
+    - vk

@@ -1,0 +1,45 @@
+name: Sync Profile Stack
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'src/**'
+      - 'pyproject.toml'
+      - '.github/workflows/sync-profile.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout profile repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install profile-sync package
+        run: pip install .
+
+      - name: Update README stack badges
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+        run: profile-sync
+
+      - name: Commit and push README and badges if changed
+        run: |
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor_id }}+${{ github.actor }}@://github.com"
+          git add -A README.md assets/badges/
+          git diff --staged --quiet || git commit -m "DOCS | update profile tech stack badges"
+          git push

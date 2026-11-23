@@ -1,0 +1,76 @@
+name: Banner CI/CD
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "src/banner/**"
+      - "configs/git/gitconfig"
+      - "**/ruff.toml"
+      - ".github/workflows/banner-ci-cd.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/banner/**"
+      - "**/ruff.toml"
+      - ".github/workflows/banner-ci-cd.yml"
+
+jobs:
+  lint-and-test:
+    name: CI - Lint & Dry Run
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout dotfiles
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Check code style with Ruff
+        uses: astral-sh/ruff-action@v3
+        with:
+          args: "check --config configs/ruff/ruff.toml src/banner/build.py"
+
+      - name: Verify CLI help
+        run: python3 src/banner/build.py --help
+
+  sync-to-profile:
+    name: CD - Sync SVG to Profile README
+    needs: lint-and-test
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout dotfiles
+        uses: actions/checkout@v4
+
+      - name: Checkout profile repository
+        uses: actions/checkout@v4
+        with:
+          repository: briliov/briliov
+          token: ${{ secrets.PROFILE_REPO_TOKEN }}
+          path: profile-repo
+
+      - name: Copy banner.svg and push to profile
+        run: |
+          AUTHOR_NAME=$(git config -f configs/git/gitconfig user.name)
+          AUTHOR_EMAIL=$(git config -f configs/git/gitconfig user.email)
+
+          mkdir -p profile-repo/src
+          cp src/banner/data/banner.svg profile-repo/src/banner.svg
+
+          cd profile-repo
+          git config user.name "$AUTHOR_NAME"
+          git config user.email "$AUTHOR_EMAIL"
+
+          git rm -f banner.svg 2>/dev/null || true
+          git add src/banner.svg
+
+          if git diff --staged --quiet; then
+            echo "No changes in src/banner.svg"
+          else
+            git commit -m "CHORE | Banner | Sync SVG from .dotfiles"
+            git push
+          fi
