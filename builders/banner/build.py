@@ -37,7 +37,7 @@ REMOTE_FONTS_RAW = (
 
 
 def resolve_out_dir(cli_out: Path | None, push: bool = False) -> Path:
-    """Resolve output directory: repo assets/banner if --push, else CLI -> env -> cwd."""
+    """Resolve output directory: repo assets/banner if --push, else CLI -> env -> error."""
     if push:
         hub_env = os.environ.get('GH_HUB_DIR')
         repo_root = Path(hub_env).expanduser().resolve() if hub_env else Path(__file__).resolve().parents
@@ -47,27 +47,7 @@ def resolve_out_dir(cli_out: Path | None, push: bool = False) -> Path:
     env_out = os.environ.get('BANNER_OUT_DIR')
     if env_out:
         return Path(env_out).expanduser().resolve()
-    return Path.cwd()
-
-def load_local_presets(out_dir: Path) -> dict[str, list[str]]:
-    """Load presets from presets.json in out_dir, initializing defaults if missing."""
-    presets_file = Path(__file__).resolve().parent / 'presets.json'
-    if not presets_file.exists():
-        out_dir.mkdir(parents=True, exist_ok=True)
-        presets_file.write_text(
-            json.dumps(DEFAULT_PRESETS, indent=2) + '\n',
-            encoding='utf-8',
-        )
-        return dict(DEFAULT_PRESETS)
-
-    try:
-        data = json.loads(presets_file.read_text(encoding='utf-8'))
-        if isinstance(data, dict):
-            return {str(k): list(v) for k, v in data.items()}
-    except (json.JSONDecodeError, TypeError) as exc:
-        sys.exit(f"Error reading '{presets_file}': {exc}")
-    return dict(DEFAULT_PRESETS)
-
+    sys.exit('Error: Specify output target via -o <dir>, --push, or BANNER_OUT_DIR env var.')
 
 def save_local_preset(out_dir: Path, name: str, colors: list[str]) -> None:
     """Save or update a named color preset inside out_dir/presets.json."""
@@ -372,7 +352,7 @@ def build(args: argparse.Namespace) -> None:
     )
 
 
-def parse_args() -> argparse.Namespace:
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     """Parse CLI arguments for banner customization and preset management."""
     parser = argparse.ArgumentParser(
         description='Configure and build Zsh + SVG banners with local presets.',
@@ -434,11 +414,13 @@ def parse_args() -> argparse.Namespace:
         metavar='FONT',
         help="List fonts, or install one: -l 'ANSI Shadow' / -l install 'ANSI Shadow'",
     )
-    return parser.parse_args()
+    return parser.parse_args(argv)
 
 
 def main() -> None:
     """CLI entry point."""
+    if len(sys.argv) == 1:
+        parse_args(['--help'])
     args = parse_args()
     if args.list_fonts is not None:
         if not args.list_fonts:
