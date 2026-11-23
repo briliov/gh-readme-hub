@@ -28,55 +28,58 @@ DEFAULT_PRESETS: dict[str, list[str]] = {
     'steel': ['#cbd5e1', '#64748b', '#38bdf8'],
 }
 
-REMOTE_FONTS_API = (
-    'https://' + '://github.com'
-)
-REMOTE_FONTS_RAW = (
-    'https://' + '://githubusercontent.com'
-)
+PRESETS_PATH = Path(__file__).resolve().parent / 'presets.json'
+REPO_ASSETS_DIR = Path(__file__).resolve().parents[2] / 'assets'
+REMOTE_FONTS_API = 'https://' + '://github.com'
+REMOTE_FONTS_RAW = 'https://' + '://githubusercontent.com'
+
+
+def has_repo_target() -> bool:
+    """Return True if the script resides inside a cloned hub repository with assets/."""
+    return REPO_ASSETS_DIR.is_dir()
 
 
 def resolve_out_dir(cli_out: Path | None, push: bool = False) -> Path:
     """Resolve output directory: repo assets/banner if --push, else explicit -o path."""
     if push:
-        hub_env = os.environ.get('GH_HUB_DIR')
-        repo_root = Path(hub_env).expanduser().resolve() if hub_env else Path(__file__).resolve().parents[2]
-        return repo_root / 'assets' / 'banner'
+        if not has_repo_target():
+            sys.exit(
+                'Error: --push is unavailable because repository assets/ directory was not found.'
+            )
+        return REPO_ASSETS_DIR / 'banner'
     if cli_out is not None:
         return cli_out.expanduser().resolve()
-    sys.exit('Error: Specify output target via -o <dir> or --push.')
+    hint = ' or --push' if has_repo_target() else ''
+    sys.exit(f'Error: Specify output target via -o <dir>{hint}.')
 
 
-
-def load_local_presets(_out_dir: Path | None = None) -> dict[str, list[str]]:
+def load_local_presets() -> dict[str, list[str]]:
     """Load presets from presets.json next to the script, initializing defaults if missing."""
-    presets_file = Path(__file__).resolve().parent / 'presets.json'
-    if not presets_file.exists():
-        presets_file.write_text(
+    if not PRESETS_PATH.exists():
+        PRESETS_PATH.write_text(
             json.dumps(DEFAULT_PRESETS, indent=2) + '\n',
             encoding='utf-8',
         )
         return dict(DEFAULT_PRESETS)
 
     try:
-        data = json.loads(presets_file.read_text(encoding='utf-8'))
+        data = json.loads(PRESETS_PATH.read_text(encoding='utf-8'))
         if isinstance(data, dict):
             return {str(k): list(v) for k, v in data.items()}
     except (json.JSONDecodeError, TypeError) as exc:
-        sys.exit(f"Error reading '{presets_file}': {exc}")
+        sys.exit(f"Error reading '{PRESETS_PATH}': {exc}")
     return dict(DEFAULT_PRESETS)
 
 
-def save_local_preset(_out_dir: Path | None, name: str, colors: list[str]) -> None:
+def save_local_preset(name: str, colors: list[str]) -> None:
     """Save or update a named color preset inside presets.json."""
     presets = load_local_presets()
     presets[name] = colors
-    presets_file = Path(__file__).resolve().parent / 'presets.json'
-    presets_file.write_text(
+    PRESETS_PATH.write_text(
         json.dumps(presets, indent=2) + '\n',
         encoding='utf-8',
     )
-    print(f"Saved preset '{name}' ({', '.join(colors)}) -> {presets_file}")
+    print(f"Saved preset '{name}' ({', '.join(colors)}) -> {PRESETS_PATH}")
 
 
 def get_figlet_font_dir() -> Path:
@@ -132,7 +135,7 @@ def list_fonts() -> None:
         print(' ', ', '.join(available[:60]))
         if len(available) > 60:
             print(f'  ... and {len(available) - 60} more')
-        print("\nInstall any font with: --install-font 'FONT_NAME'")
+        print("\nInstall any font with: -l install 'FONT_NAME'")
     else:
         print('\nRemote font catalog unavailable (offline mode).')
 
@@ -253,7 +256,7 @@ def build(args: argparse.Namespace) -> None:
     """Generate banner.txt, banner.zsh, and banner.svg in the target directory."""
     out_dir = resolve_out_dir(args.out, args.push)
     out_dir.mkdir(parents=True, exist_ok=True)
-    presets = load_local_presets(out_dir)
+    presets = load_local_presets()
 
     if args.colors:
         raw_colors = parse_color_list(args.colors)
@@ -262,13 +265,13 @@ def build(args: argparse.Namespace) -> None:
         if args.preset not in presets:
             available = ', '.join(presets.keys())
             sys.exit(
-                f"Unknown preset '{args.preset}' in {Path(__file__).resolve().parent / 'presets.json'}. Available: {available}"
+                f"Unknown preset '{args.preset}' in {PRESETS_PATH}. Available: {available}"
             )
         raw_colors = presets[args.preset]
         theme_label = args.preset
 
     if args.save_preset:
-        save_local_preset(out_dir, args.save_preset, raw_colors)
+        save_local_preset(args.save_preset, raw_colors)
         theme_label = args.save_preset
 
     art_path = out_dir / 'banner.txt'
@@ -387,7 +390,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         '-p',
         '--preset',
         default=DEFAULT_PRESET,
-        help='Preset name from presets.json in output directory',
+        help='Preset name from presets.json',
     )
     parser.add_argument(
         '-c',
@@ -397,7 +400,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         '--save-preset',
         metavar='NAME',
-        help='Save current colors into out_dir/presets.json under NAME',
+        help='Save current colors into presets.json under NAME',
     )
     parser.add_argument(
         '-d',
@@ -422,7 +425,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         '--push',
         action='store_true',
-        help='Save generated banner directly into repository assets/banner/',
+        help=(
+            'Save generated banner directly into repository assets/banner/'
+            if has_repo_target()
+            else argparse.SUPPRESS
+        ),
     )
     parser.add_argument(
         '-o',
