@@ -37,29 +37,14 @@ REMOTE_FONTS_RAW = (
 
 
 def resolve_out_dir(cli_out: Path | None, push: bool = False) -> Path:
-    """Resolve output directory: repo assets/banner if --push, else CLI -> env -> error."""
+    """Resolve output directory: repo assets/banner if --push, else explicit -o path."""
     if push:
         hub_env = os.environ.get('GH_HUB_DIR')
-        repo_root = Path(hub_env).expanduser().resolve() if hub_env else Path(__file__).resolve().parents
+        repo_root = Path(hub_env).expanduser().resolve() if hub_env else Path(__file__).resolve().parents[2]
         return repo_root / 'assets' / 'banner'
     if cli_out is not None:
         return cli_out.expanduser().resolve()
-    env_out = os.environ.get('BANNER_OUT_DIR')
-    if env_out:
-        return Path(env_out).expanduser().resolve()
-    sys.exit('Error: Specify output target via -o <dir>, --push, or BANNER_OUT_DIR env var.')
-
-def save_local_preset(out_dir: Path, name: str, colors: list[str]) -> None:
-    """Save or update a named color preset inside out_dir/presets.json."""
-    presets = load_local_presets(out_dir)
-    presets[name] = colors
-    presets_file = Path(__file__).resolve().parent / 'presets.json'
-    presets_file.write_text(
-        json.dumps(presets, indent=2) + '\n',
-        encoding='utf-8',
-    )
-    print(f"Saved preset '{name}' ({', '.join(colors)}) -> {presets_file}")
-
+    sys.exit('Error: Specify output target via -o <dir> or --push.')
 
 def get_figlet_font_dir() -> Path:
     """Return local FIGlet fonts directory path."""
@@ -405,7 +390,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         '-o',
         '--out',
         type=Path,
-        help='Output directory (defaults to BANNER_OUT_DIR env var or current dir)',
+        help='Output directory (required unless --push is passed)',
     )
     parser.add_argument(
         '-l',
